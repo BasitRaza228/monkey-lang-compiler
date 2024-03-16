@@ -1,14 +1,15 @@
 package evaluator
 
-import (
-	"github.com/BasitRaza228/monkey-lang-compiler/object"
-)
+import "github.com/BasitRaza228/monkey-lang-compiler/object"
 
-var builtins = map[string]*object.Builtin{
+var builtinFunctions = map[string]*object.Builtin{
 	"len":   object.GetBuiltinByName("len"),
+	"print": object.GetBuiltinByName("print"),
 	"first": object.GetBuiltinByName("first"),
 	"last":  object.GetBuiltinByName("last"),
 	"rest":  object.GetBuiltinByName("rest"),
 	"push":  object.GetBuiltinByName("push"),
-	"puts":  object.GetBuiltinByName("puts"),
+	"pop":   object.GetBuiltinByName("pop"),
+	"split": object.GetBuiltinByName("split"),
+	"join":  object.GetBuiltinByName("join"),
 }
