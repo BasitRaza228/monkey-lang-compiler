@@ -1,20 +1,87 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-	"os/user"
 
+	"github.com/BasitRaza228/monkey-lang-compiler/ast"
+	"github.com/BasitRaza228/monkey-lang-compiler/compiler"
+	"github.com/BasitRaza228/monkey-lang-compiler/evaluator"
+	"github.com/BasitRaza228/monkey-lang-compiler/lexer"
+	"github.com/BasitRaza228/monkey-lang-compiler/object"
+	"github.com/BasitRaza228/monkey-lang-compiler/parser"
 	"github.com/BasitRaza228/monkey-lang-compiler/repl"
+	"github.com/BasitRaza228/monkey-lang-compiler/vm"
 )
 
 func main() {
-	user, err := user.Current()
-	if err != nil {
-		panic(err)
+
+	fmt.Println("Monkey Compiler")
+	// Define and parse flag options
+	engine := flag.String("engine", "vm", "Engine options are \"vm\" or \"eval\"")
+	console := flag.Bool("console", false, "Provide console flag to enter interactive repl")
+	flag.Parse()
+
+	if *engine != "vm" && *engine != "eval" {
+		fmt.Printf("Engine must be either 'vm' or 'eval', got %s\n", *engine)
+		return
 	}
-	fmt.Printf("Hello %s! This is the Monkey programming language!\n",
-		user.Username)
-	fmt.Printf("Feel free to type in commands\n")
-	repl.Start(os.Stdin, os.Stdout)
+
+	// If console flag is provided, run interactive console - otherwise read file and execute
+	if *console {
+		fmt.Println("Starting REPL...")
+		repl.Start(os.Stdin, os.Stdout, engine)
+	} else {
+		fmt.Println("Running file...")
+		if len(flag.Args()) != 1 {
+			fmt.Println("Incorrect usage. Usage: `monkey [option...] filePath`")
+			return
+		}
+
+		var result object.Object
+
+		filePath := flag.Args()[0]
+		contents, err := os.ReadFile(filePath)
+		if err != nil {
+			fmt.Printf("Failure to read file '%s'. Err: %s", string(contents), err)
+		}
+
+		l := lexer.New(string(contents))
+		p := parser.New(l)
+		program := p.ParseProgram()
+
+		if *engine == "vm" {
+			result = compileBytecodeAndRun(program)
+		} else {
+			result = evaluateAst(program)
+		}
+
+		fmt.Println(result.Inspect())
+	}
+}
+
+// Evaluate the AST with evaluator
+func evaluateAst(program *ast.RootNode) object.Object {
+	env := object.NewEnvironment()
+	return evaluator.Eval(program, env)
+}
+
+// Compile program to bytecode, pass to VM, and run. Returns the last popped stack element (result)
+func compileBytecodeAndRun(program *ast.RootNode) object.Object {
+	comp := compiler.New()
+
+	err := comp.Compile(program)
+	if err != nil {
+		fmt.Printf("compiler error: %s", err)
+	}
+
+	vm := vm.New(comp.Bytecode())
+
+	err = vm.Run()
+	if err != nil {
+		fmt.Printf("vm error: %s", err)
+	}
+
+	return vm.LastPoppedStackElement()
 }
