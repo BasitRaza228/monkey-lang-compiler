@@ -5,21 +5,23 @@ import (
 	"github.com/BasitRaza228/monkey-lang-compiler/object"
 )
 
+// Data structure that holds execution-relevant information.
 type Frame struct {
-	cl          *object.Closure
+	closure     *object.Closure
 	ip          int
-	basePointer int
+	basePointer int // Keeps track of the stacks pointer's value
 }
 
+// Instructions returns the frame's function's instructions
+func (f *Frame) Instructions() code.Instructions {
+	return f.closure.Fn.Instructions
+}
+
+// pointer to -1, and returns a pointer to the frame.
 func NewFrame(cl *object.Closure, basePointer int) *Frame {
-	f := &Frame{
-		cl:          cl,
+	return &Frame{
+		closure:     cl,
 		ip:          -1,
 		basePointer: basePointer,
 	}
-	return f
-}
-
-func (f *Frame) Instructions() code.Instructions {
-	return f.cl.Fn.Instructions
 }
