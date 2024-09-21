@@ -33,28 +33,23 @@ git clone https://github.com/BasitRaza228/monkey-lang-compiler.git
 cd monkey-go
 ```
 
-Build the REPL:
+Build:
 
 ```bash
-go build -o bin/monkey ./cmd/monkey
+go build -o monkey main.go
 ```
 
-Run the REPL:
+Run:
+
+./monkey [option...] filePath
 
 ```bash
-./bin/monkey
-```
-
-Or run a Monkey source file:
-
-```bash
-go run ./cmd/monkey -- run examples/factorial.monkey
-```
-
-Run tests:
-
-```bash
-go test ./... -v
+# running with vm
+./monkey --engine=vm examples/program.mo
+# OR running with evaluator
+./monkey --engine=eval examples/program.mo
+# For interactive console
+./monkey --console
 ```
 
 ---
