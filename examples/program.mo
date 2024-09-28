@@ -1,4 +1,4 @@
-let globalNum = 10.9;
+let globalNum = 10;
 
 let sum = func(a, b) {
   let c = a + b;
@@ -22,9 +22,6 @@ print("Nice") // Or like this
 
 const cantChangeMe = "neat";
 print(cantChangeMe);
-
-let number = 21.76 / 13.2;
-print(number)
 
 const moduloResult = (21 % 8) % (8 % 3);
 print(moduloResult);
